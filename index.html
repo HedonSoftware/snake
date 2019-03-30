@@ -6,63 +6,79 @@ window.onload=function() {
 	document.addEventListener("keydown",keyPush);
 	setInterval(game,1000/15);
 }
-px=py=10;
-gs=tc=20;
-ax=ay=15;
-xv=yv=0;
+positionX=positionY=10;
+gridSize=tileCounter=20;
+appleX=appleY=15;
+movingX=movingY=0;
 trail=[];
 tail = 5;
 function game() {
-	px+=xv;
-	py+=yv;
-	if(px<0) {
-		px= tc-1;
+	positionX += movingX;
+	positionY += movingY;
+	// if it gone off the screen on the left, move it to the right
+	if(positionX < 0) {
+		positionX = tileCounter - 1;
 	}
-	if(px>tc-1) {
-		px= 0;
+
+	// if it gone off the screen on the right, move it to the left
+	if(positionX > tileCounter - 1) {
+		positionX = 0;
 	}
-	if(py<0) {
-		py= tc-1;
+
+	// if it gone off the screen on the top, move it to the bottom
+	if(positionY < 0) {
+		positionY = tileCounter - 1;
 	}
-	if(py>tc-1) {
-		py= 0;
+
+	// if it gone off the screen on the bottom, move it to the top
+	if(positionY > tileCounter - 1) {
+		positionY = 0;
 	}
+
+	// reset canvas to black
 	ctx.fillStyle="black";
 	ctx.fillRect(0,0,canv.width,canv.height);
 
+	// draw the snake
 	ctx.fillStyle="lime";
 	for(var i=0;i<trail.length;i++) {
-		ctx.fillRect(trail[i].x*gs,trail[i].y*gs,gs-2,gs-2);
-		if(trail[i].x==px && trail[i].y==py) {
+		ctx.fillRect(trail[i].x*gridSize, trail[i].y*gridSize, gridSize-2, gridSize-2);
+		// is current position a self-bite
+		if(trail[i].x == positionX  && trail[i].y == positionY) {
 			tail = 5;
 		}
 	}
-	trail.push({x:px,y:py});
-	while(trail.length>tail) {
-	trail.shift();
+
+	trail.push({x:positionX, y:positionY});
+	// we just added one more than required so we need to drop last element from the tail
+	while(trail.length > tail) {
+		trail.shift();
 	}
 
-	if(ax==px && ay==py) {
+	// have we reached an apple - then make snake longer and decide on new apple position
+	if(appleX==positionX && appleY==positionY) {
 		tail++;
-		ax=Math.floor(Math.random()*tc);
-		ay=Math.floor(Math.random()*tc);
+		appleX = Math.floor(Math.random()*tileCounter);
+		appleY = Math.floor(Math.random()*tileCounter);
 	}
+
+	// draw apple	
 	ctx.fillStyle="red";
-	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
+	ctx.fillRect(appleX*gridSize, appleY*gridSize, gridSize-2, gridSize-2);
 }
 function keyPush(evt) {
 	switch(evt.keyCode) {
 		case 37:
-			xv=-1;yv=0;
+			movingX=-1;movingY=0;
 			break;
 		case 38:
-			xv=0;yv=-1;
+			movingX=0;movingY=-1;
 			break;
 		case 39:
-			xv=1;yv=0;
+			movingX=1;movingY=0;
 			break;
 		case 40:
-			xv=0;yv=1;
+			movingX=0;movingY=1;
 			break;
 	}
 }
